@@ -16,6 +16,7 @@
     <div class="container-fluide">
         <div class="row justify-content-center mt-5">
             <div class="col-md-4">
+                <div id="errmsg"></div>
                 <div class="card">
                     <div class="card-header text-center bg-success">
                         Login 
@@ -24,14 +25,14 @@
                         <div class="row justify-content-center">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <input type="text" class="form-control" name="user" placeholder="Enter Username" />
+                                    <input type="text" class="form-control" name="name" id="name" placeholder="Enter Username" />
                                 </div>
                             </div>
                         </div>
                         <div class="row justify-content-center mt-2">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <input type="text" class="form-control" name="user" placeholder="Enter Username" />
+                                    <input type="password" class="form-control" name="pass" id="pass" placeholder="Enter Password" />
                                 </div>
                             </div>
                         </div>
@@ -45,7 +46,7 @@
                         <div class="row justify-content-center mt-3">
                             <div class="col-sm-4">
                                 <div class="form-group">
-                                    <input type="text" class="form-control" name="user" placeholder="Enter Captcha Here" />
+                                    <input type="text" class="form-control" name="captcha" id="captcha" placeholder="Enter Captcha Here" />
                                 </div>
                             </div>
                             <div class="col-sm-2">
@@ -56,8 +57,8 @@
                         </div>
                         <div class="row justify-content-center mt-2">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <input type="button" class="form-control btn btn-success" id="lgBtn" value="Login" /> 
+                                <div class="form-group" id="lgLoad">
+                                    <input type="button" class="form-control btn btn-success" id="lgBtn" value="Login" />
                                 </div>
                             </div>
                             
@@ -73,5 +74,38 @@
 <script type="text/javascript">
     $("#refreshBtn").on("click", function(){
         $('#capImg').attr('src','captcha.php');        
+    });
+
+    $("#lgBtn").on("click", function(){
+        let uname = $("#name").val();
+        let pass = $("#pass").val();
+        let capt = $("#captcha").val();
+
+        if(uname == '' || pass == '' || capt == ''){
+            $("#errmsg").html("<p class='alert alert-danger text-center'>All Fields Are Required...</p>").hide(5000);
+        }else{
+            $.ajax({
+                type:"POST",
+                url:"login.php",
+                data:{
+                    userName : uname,
+                    password : pass,
+                    captcha : capt
+                },
+                success:function(data){
+                    data = JSON.parse(data);
+                    if(data.code == '0'){
+                        $("#errmsg").html("<p class='alert alert-danger text-center'>"+data.status+"</p>").hide(5000);
+                    }else if(data.code == '2'){
+                        $("#errmsg").html("<p class='alert alert-danger text-center'>"+data.status+"</p>").hide(5000);
+                    }else{
+                        window.location.href="dashboard.php?page=home";
+                    }
+                },
+                error:function(error){
+                    console.log(error);
+                }
+            });
+        }
     });
 </script>
